@@ -4,11 +4,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Entities;
+using WebAPI.Filters;
 
 namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    
     public class SubscriberController(DataContext context) : ControllerBase
     {
         private readonly DataContext _context = context;
@@ -16,10 +18,8 @@ namespace WebAPI.Controllers
 
         #region Create
         [HttpPost]
-
-       
-
-        public async Task<IActionResult> Create(SubscriberDTO dto)
+        [UseApiKey]
+        public async Task<IActionResult> Create(SubscriberDto dto)
         {
             if (ModelState.IsValid)
             {
@@ -68,11 +68,36 @@ namespace WebAPI.Controllers
         }
         #endregion
 
+        #region GET
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var subscribers = await _context.Subscribers.ToListAsync();
+
+            return Ok(subscribers);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetOne(int id)
+        {
+            var subscriber = await _context.Subscribers.FindAsync(id);
+
+            if (subscriber == null)
+            {
+                return NotFound("Subscriber not found");
+            }
+
+            return Ok(subscriber);
+        }
+
+        #endregion
+
         #region UPDATE
 
         [HttpPut("{id}")]
 
-        public async Task<IActionResult> Update(int id, SubscriberDTO dto)
+        public async Task<IActionResult> Update(int id, SubscriberDto dto)
         {
             var subscriber = await _context.Subscribers.FindAsync(id);
 

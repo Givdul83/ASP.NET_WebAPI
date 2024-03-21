@@ -1,7 +1,7 @@
 ﻿
 namespace Infrastructure.Models;
 
-public class SubscriberDTO
+public class SubscriberDto
 {
     public string Email { get; set; } = null!;
 
