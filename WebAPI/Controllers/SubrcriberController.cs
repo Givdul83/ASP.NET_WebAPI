@@ -10,7 +10,7 @@ namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    
+
     public class SubscriberController(DataContext context) : ControllerBase
     {
         private readonly DataContext _context = context;
@@ -23,8 +23,8 @@ namespace WebAPI.Controllers
         {
             if (ModelState.IsValid)
             {
-                if(! await _context.Subscribers.AnyAsync(x => x.Email == dto.Email))
-                 {
+                if (!await _context.Subscribers.AnyAsync(x => x.Email == dto.Email))
+                {
                     var subscriber = new SubscriberEntity
                     {
                         Email = dto.Email,
@@ -35,9 +35,9 @@ namespace WebAPI.Controllers
                         EventUpdates = dto.EventUpdates,
                         WeekInReview = dto.WeekInReview
                     };
-                     await _context.Subscribers.AddAsync(subscriber);
+                    await _context.Subscribers.AddAsync(subscriber);
                     await _context.SaveChangesAsync();
-                    return Created("You have been registered",subscriber);
+                    return Created("You have been registered", subscriber);
 
                 }
 
@@ -54,7 +54,7 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var subscriber = await _context.Subscribers.FindAsync(id);
-            if(subscriber ==null)
+            if (subscriber == null)
             {
                 return NotFound("Subscriber not found");
             }
@@ -65,6 +65,22 @@ namespace WebAPI.Controllers
 
                 return Ok("Subscriber was deleted");
             }
+        }
+
+        [HttpDelete("email")]
+        [UseApiKey]
+        public async Task<IActionResult> DeleteWithEmail(string email)
+        {
+            var result = await FindByEmail(email);
+
+            if (result is OkObjectResult okResult && okResult.Value is SubscriberEntity sub)
+            {
+                _context.Subscribers.Remove(sub);
+                await _context.SaveChangesAsync();
+                return Ok("Subscriber was deleted");
+            }
+
+            return result;
         }
         #endregion
 
@@ -91,33 +107,49 @@ namespace WebAPI.Controllers
             return Ok(subscriber);
         }
 
-        #endregion
+        [HttpGet("email/{email}")]
 
-        #region UPDATE
-
-        [HttpPut("{id}")]
-
-        public async Task<IActionResult> Update(int id, SubscriberDto dto)
+        public async Task<IActionResult> FindByEmail(string email)
         {
-            var subscriber = await _context.Subscribers.FindAsync(id);
+            
+                var sub = await _context.Subscribers.FirstOrDefaultAsync(x => x.Email == email);
 
-            if (subscriber == null)
-            {
-                return NotFound("Subscriber not found");
-            }
+                if (sub != null)
+                {
+                    return Ok(sub);
+                }
 
-            subscriber.Email = dto.Email;
-            subscriber.DailyNewsletter = dto.DailyNewsletter;
-            subscriber.AdvertisingUpdates = dto.AdvertisingUpdates;
-            subscriber.WeekInReview = dto.WeekInReview;
-            subscriber.EventUpdates = dto.EventUpdates;
-            subscriber.StartupsWeekly = dto.StartupsWeekly;
-            subscriber.Podcasts = dto.Podcasts;
+                return NotFound();
 
-            await _context.SaveChangesAsync();
-
-            return Ok("Subscriber was updated");
+            
         }
-        #endregion
-    }
-}
+                   #endregion
+
+                    #region UPDATE
+
+                    [HttpPut("{id}")]
+
+                    public async Task<IActionResult> Update(int id, SubscriberDto dto)
+                    {
+                        var subscriber = await _context.Subscribers.FindAsync(id);
+
+                        if (subscriber == null)
+                        {
+                            return NotFound("Subscriber not found");
+                        }
+
+                        subscriber.Email = dto.Email;
+                        subscriber.DailyNewsletter = dto.DailyNewsletter;
+                        subscriber.AdvertisingUpdates = dto.AdvertisingUpdates;
+                        subscriber.WeekInReview = dto.WeekInReview;
+                        subscriber.EventUpdates = dto.EventUpdates;
+                        subscriber.StartupsWeekly = dto.StartupsWeekly;
+                        subscriber.Podcasts = dto.Podcasts;
+
+                        await _context.SaveChangesAsync();
+
+                        return Ok("Subscriber was updated");
+                    }
+                    #endregion
+                }
+            }

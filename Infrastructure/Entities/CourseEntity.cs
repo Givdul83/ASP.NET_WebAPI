@@ -23,4 +23,7 @@ public class CourseEntity
     public string? Author {  get; set; }
 
     public string? CoursePictureUrl { get; set; }
+
+
+    public virtual IEnumerable<SavedCoursesEntity> SavedCourses { get; set; } = new List<SavedCoursesEntity>();
 }
