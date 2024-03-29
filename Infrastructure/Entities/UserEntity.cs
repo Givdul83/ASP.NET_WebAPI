@@ -1,4 +1,6 @@
 ﻿
+using System.Text.Json.Serialization;
+
 namespace Infrastructure.Entities;
 
 public class UserEntity
@@ -7,6 +9,8 @@ public class UserEntity
 
     public string Email { get; set; } = null!;
 
-    public virtual IEnumerable<SavedCoursesEntity> SavedCourses { get; set; } = new List<SavedCoursesEntity>();
+
+    [JsonIgnore]
+    public IEnumerable <SavedCoursesEntity> SavedCourses { get; set; } = new List<SavedCoursesEntity>();
 
 }

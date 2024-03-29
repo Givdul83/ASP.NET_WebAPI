@@ -72,7 +72,7 @@ namespace WebAPI.Controllers
 
             if (course == null)
             {
-                return NotFound("Subscriber not found");
+                return NotFound("course not found");
             }
 
             return Ok(course);

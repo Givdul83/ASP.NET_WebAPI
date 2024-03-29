@@ -111,45 +111,45 @@ namespace WebAPI.Controllers
 
         public async Task<IActionResult> FindByEmail(string email)
         {
-            
-                var sub = await _context.Subscribers.FirstOrDefaultAsync(x => x.Email == email);
 
-                if (sub != null)
-                {
-                    return Ok(sub);
-                }
+            var sub = await _context.Subscribers.FirstOrDefaultAsync(x => x.Email == email);
 
-                return NotFound();
-
-            
-        }
-                   #endregion
-
-                    #region UPDATE
-
-                    [HttpPut("{id}")]
-
-                    public async Task<IActionResult> Update(int id, SubscriberDto dto)
-                    {
-                        var subscriber = await _context.Subscribers.FindAsync(id);
-
-                        if (subscriber == null)
-                        {
-                            return NotFound("Subscriber not found");
-                        }
-
-                        subscriber.Email = dto.Email;
-                        subscriber.DailyNewsletter = dto.DailyNewsletter;
-                        subscriber.AdvertisingUpdates = dto.AdvertisingUpdates;
-                        subscriber.WeekInReview = dto.WeekInReview;
-                        subscriber.EventUpdates = dto.EventUpdates;
-                        subscriber.StartupsWeekly = dto.StartupsWeekly;
-                        subscriber.Podcasts = dto.Podcasts;
-
-                        await _context.SaveChangesAsync();
-
-                        return Ok("Subscriber was updated");
-                    }
-                    #endregion
-                }
+            if (sub != null)
+            {
+                return Ok(sub);
             }
+
+            return NotFound();
+
+
+        }
+        #endregion
+
+        #region UPDATE
+
+        [HttpPut("{id}")]
+
+        public async Task<IActionResult> Update(int id, SubscriberDto dto)
+        {
+            var subscriber = await _context.Subscribers.FindAsync(id);
+
+            if (subscriber == null)
+            {
+                return NotFound("Subscriber not found");
+            }
+
+            subscriber.Email = dto.Email;
+            subscriber.DailyNewsletter = dto.DailyNewsletter;
+            subscriber.AdvertisingUpdates = dto.AdvertisingUpdates;
+            subscriber.WeekInReview = dto.WeekInReview;
+            subscriber.EventUpdates = dto.EventUpdates;
+            subscriber.StartupsWeekly = dto.StartupsWeekly;
+            subscriber.Podcasts = dto.Podcasts;
+
+            await _context.SaveChangesAsync();
+
+            return Ok("Subscriber was updated");
+        }
+        #endregion
+    }
+}
