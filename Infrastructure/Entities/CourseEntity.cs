@@ -26,4 +26,6 @@ public class CourseEntity
 
 
     public virtual IEnumerable<SavedCoursesEntity> SavedCourses { get; set; } = new List<SavedCoursesEntity>();
+
+    public virtual IEnumerable<MyCoursesEntity> MyCourses { get; set; } = new List<MyCoursesEntity>();
 }

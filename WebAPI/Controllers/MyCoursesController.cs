@@ -9,11 +9,9 @@ namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SavedCourseController(DataContext context) : ControllerBase
+    public class MyCoursesController(DataContext context) : ControllerBase
     {
-
         private readonly DataContext _context = context;
-
 
         [HttpPost]
 
@@ -33,18 +31,18 @@ namespace WebAPI.Controllers
                     await _context.Users.AddAsync(newUser);
                     await _context.SaveChangesAsync();
 
-                    var courseToSave = new SavedCoursesEntity
+                    var courseToSave = new MyCoursesEntity
                     {
                         CourseId = dto.CourseId,
                         UserId = newUser.Id,
                     };
 
-                    var result = await _context.SavedCourses.AddAsync(courseToSave);
+                    var result = await _context.MyCourses.AddAsync(courseToSave);
                     await _context.SaveChangesAsync();
 
                     if (result != null)
                     {
-                        return Ok(result);
+                        return Ok();
                     }
                     else
                     {
@@ -55,7 +53,7 @@ namespace WebAPI.Controllers
 
                 else if (user != null)
                 {
-                    var courseToSave = new SavedCoursesEntity
+                    var courseToSave = new MyCoursesEntity
                     {
                         UserId = user.Id,
                         CourseId = dto.CourseId,
@@ -63,12 +61,12 @@ namespace WebAPI.Controllers
 
 
 
-                    var result = await _context.SavedCourses.AddAsync(courseToSave);
+                    var result = await _context.MyCourses.AddAsync(courseToSave);
                     await _context.SaveChangesAsync();
 
                     if (result != null)
                     {
-                        return Ok(result);
+                        return Ok();
                     }
                     else
                     {
@@ -96,9 +94,9 @@ namespace WebAPI.Controllers
                 }
 
                 var courseList = new List<CourseEntity>();
-                foreach (var savedCourse in courses)
+                foreach (var myCourse in courses)
                 {
-                    var foundCourse = await _context.Courses.FirstOrDefaultAsync(x => x.Id == savedCourse.CourseId);
+                    var foundCourse = await _context.Courses.FirstOrDefaultAsync(x => x.Id == myCourse.CourseId);
                     if (foundCourse != null)
                     {
                         courseList.Add(foundCourse);
@@ -112,7 +110,7 @@ namespace WebAPI.Controllers
         }
 
 
-    
+
         [HttpDelete("{email}")]
 
         public async Task<IActionResult> Delete(string email, [FromBody] CourseToSaveDto dto)
@@ -120,20 +118,20 @@ namespace WebAPI.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == dto.UserEmail);
-                 var courses  = await GetUserCoursesAsync(user!.Email);
+                var courses = await GetUserCoursesAsync(user!.Email);
 
-                if (courses !=null) 
+                if (courses != null)
                 {
-                    
+
                     var courseToDelete = courses.FirstOrDefault(x => x.CourseId == dto.CourseId);
 
                     if (courseToDelete != null)
                     {
-                        var savedCourseEntityToDelete = await _context.SavedCourses.FirstOrDefaultAsync(c =>c.CourseId == courseToDelete.CourseId  &&  c.UserId == user.Id);
+                        var savedCourseEntityToDelete = await _context.MyCourses.FirstOrDefaultAsync(c => c.CourseId == courseToDelete.CourseId && c.UserId == user.Id);
 
                         if (savedCourseEntityToDelete != null)
                         {
-                             _context.SavedCourses.Remove(savedCourseEntityToDelete);
+                            _context.MyCourses.Remove(savedCourseEntityToDelete);
                             await _context.SaveChangesAsync();
                             return Ok("Course removed from users list");
                         }
@@ -156,11 +154,11 @@ namespace WebAPI.Controllers
                 {
                     foreach (var course in courses)
                     {
-                        var savedCourseEntityToDelete = await _context.SavedCourses.FirstOrDefaultAsync(c => c.CourseId == course.CourseId && c.UserId == user.Id);
+                        var savedCourseEntityToDelete = await _context.MyCourses.FirstOrDefaultAsync(c => c.CourseId == course.CourseId && c.UserId == user.Id);
 
                         if (savedCourseEntityToDelete != null)
                         {
-                            _context.SavedCourses.Remove(savedCourseEntityToDelete);
+                            _context.MyCourses.Remove(savedCourseEntityToDelete);
                         }
                     }
                     await _context.SaveChangesAsync();
@@ -170,15 +168,15 @@ namespace WebAPI.Controllers
             return BadRequest();
         }
 
-        private async Task<IEnumerable<SavedCoursesEntity>> GetUserCoursesAsync(string userEmail)
+        private async Task<IEnumerable<MyCoursesEntity>> GetUserCoursesAsync(string userEmail)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == userEmail);
             if (user == null)
             {
-                return new List<SavedCoursesEntity> { };
+                return new List<MyCoursesEntity> { };
             }
 
-            return await _context.SavedCourses.Where(sc => sc.UserId == user.Id).ToListAsync();
+            return await _context.MyCourses.Where(sc => sc.UserId == user.Id).ToListAsync();
         }
 
 

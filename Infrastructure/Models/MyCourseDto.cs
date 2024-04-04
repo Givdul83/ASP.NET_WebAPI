@@ -2,10 +2,9 @@
 
 namespace Infrastructure.Models;
 
-public class CourseToSaveDto
+public class MyCourseDto
 {
-
-   public string UserEmail { get; set; } = null!;
+    public string UserEmail { get; set; } = null!;
 
     public int CourseId { get; set; } = 0;
 }
